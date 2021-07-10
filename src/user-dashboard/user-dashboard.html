@@ -1,0 +1,50 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../login-usuario/login-usuario.html">
+<link rel="import" href="../visor-usuario/visor-usuario.html">
+<link rel="import" href="../visor-cuentas/visor-cuentas.html">
+
+<dom-module id="user-dashboard">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>User Dashboard</h2>
+    <iron-pages selected="[[componentUsuario]]" attr-for-selected="component-usuario">
+      <div component-usuario="login"><login-usuario on-myevent="processEvent"></emisor-evento></div>
+      <div component-usuario="dashboardUsuario">
+        <visor-usuario id="usuario"></visor-usuario>
+      </div>
+    </iron-pages>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class UserDashboard extends Polymer.Element {
+      static get is() { return 'user-dashboard'; }
+      static get properties() {
+        return {
+          componentUsuario: {
+            type: String,
+            value: "login"
+          }
+        };
+      }
+
+      processEvent(e){
+        console.log("Capturado evento del emisor");
+        console.log(e.detail);
+
+        this.$.usuario.userId = e.detail.userId;
+        this.componentUsuario = "dashboardUsuario";
+      }
+    }
+
+    window.customElements.define(UserDashboard.is, UserDashboard);
+  </script>
+</dom-module>

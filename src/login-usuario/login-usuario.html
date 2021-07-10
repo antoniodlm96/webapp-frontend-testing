@@ -1,0 +1,93 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="login-usuario">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <input placeholder="email" type="email" value="{{email::input}}"></input>
+    <input placeholder="password" type="password" value="{{password::input}}"></input>
+    <button on-click="login">Login</button>
+    <span hidden$="{{!isLogged}}">Bienvenido/a de nuevo</span>
+
+    <iron-ajax
+      id="doLogin"
+      url="http://localhost:3000/apitechu/v2/login"
+      handle-as="json"
+      content-type="application/json"
+      method="POST"
+      on-response="manageAJAXResponse"
+      on-error="showError">
+    </iron-ajax>
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class LoginUsuario extends Polymer.Element {
+      static get is() { return 'login-usuario'; }
+      static get properties() {
+        return {
+          email: {
+            type: String
+          }, password: {
+            type: String
+          }, isLogged: {
+            type: Boolean,
+            value: false
+          }
+        };
+      }
+
+      login() {
+        console.log("El usuario ha pulsado el boton");
+        console.log("Enviando la petición de login");
+        //console.log(this.email);
+        //console.log(this.password);
+
+        var loginData = {
+          "email": this.email,
+          "password": this.password
+        }
+
+        this.$.doLogin.body = JSON.stringify(loginData);
+        this.$.doLogin.generateRequest();
+
+        console.log("Peticion enviada");
+      }
+
+      manageAJAXResponse(data){
+        console.log("Llegaron los resultados");
+        console.log(data.detail.response);
+        this.isLogged = true;
+
+        this.dispatchEvent(
+          new CustomEvent(
+            "myevent",
+            {
+              "detail" : {
+                "userId": data.detail.response.idUsuario
+              }
+            }
+          )
+        )
+      }
+
+      showError(error){
+        console.log("Hubo un error");
+        console.log(error);
+        this.isLogged = false;
+      }
+
+
+    }
+
+    window.customElements.define(LoginUsuario.is, LoginUsuario);
+  </script>
+</dom-module>

@@ -1,0 +1,63 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="visor-cuentas">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div> Lista de cuentas: </div>
+    <dom-repeat items="{{cuentas}}">
+      <template>
+        <div>ID: <span>{{item.UserId}}</span></div>
+        <div>IBAN: <span>{{item.IBAN}}</span></div>
+        <div>Balance: <span>{{item.Balance}}</span></div>
+      </template>
+    </dom-repeat>
+
+    <iron-ajax
+      id="getAccounts"
+      url="http://localhost:3000/apitechu/v2/accounts/{{userId}}"
+      handle-as="json"
+      on-response="showData"></iron-ajax>
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class VisorCuentas extends Polymer.Element {
+      static get is() { return 'visor-cuentas'; }
+      static get properties() {
+        return {
+          cuentas: {
+            type: Array
+          }, userId: {
+            type: Number,
+            observer: '_accountObserver'
+          }
+        };
+      }
+
+      showData(data) {
+        console.log("Ha llegado respuesta");
+        console.log(data.detail.response);
+
+        this.cuentas = data.detail.response;
+      }
+
+      _accountObserver(newValue, oldValue){
+        console.log("Cargando usuario");
+
+        this.$.getAccounts.generateRequest();
+      }
+    }
+
+    window.customElements.define(VisorCuentas.is, VisorCuentas);
+  </script>
+</dom-module>
